@@ -1,0 +1,14 @@
+# output files or log files
+*.csv
+*.log
+*.pyc
+*.spec
+*.dat
+
+# directory path or directory name
+output/
+log/
+build/
+dist/
+download/
+.vscode/
