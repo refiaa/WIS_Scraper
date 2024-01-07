@@ -1,13 +1,44 @@
 
-<p align="center"><img src="https://github.com/refiaa/WIS_Scraper/assets/112306763/7fee5d5f-dd9d-4ec0-a753-795beb412f51" width="200px" height="200px" alt="WIS_Scraper"></p>
+<div align="center">
 
-<h1 align="center">Water Information System Scraper</h1>
+# <img src="https://raw.githubusercontent.com/refiaa/WIS_Scraper/main/WIS_Scraper.ico" width="96" height="96"> </img> WIS_Scraper 
+
 <em><h5 align="center">(Programming Language - Python 3)</h5></em>
 
-<p align="center">
-<a href="https://github.com/refiaa/WIS_Scraper/releases/latest"><img alt="WIS_Scraper latest release" src="https://img.shields.io/github/v/release/refiaa/WIS_Scraper?style=for-the-badge&color=blue"></a>
+[![GitHub release](https://img.shields.io/github/release/refiaa/WIS_Scraper.svg?color=Green)](https://github.com/refiaa/WIS_Scraper/releases/latest)
+[![Downloads](https://img.shields.io/github/downloads/refiaa/WIS_Scraper/total?color=6451f1)](https://github.com/refiaa/WIS_Scraper/releases/latest)
+[![WIS_Scraper issues](https://img.shields.io/github/issues/refiaa/WIS_Scraper?color=yellow)](https://github.com/refiaa/WIS_Scraper/issues)
+[![WIS_Scraper License](https://img.shields.io/github/license/refiaa/WIS_Scraper?color=orange)](#)
 
-> 臨時説明です。
+
+WIS_Scraperは国土交通省の水文水質データベースからデータの検索・ダウンロードのためのツールです。
+
+## Getting Started
+
+<div align="left">
+
+### プログラムで利用したい方へ
+
+この[ページ](https://github.com/refiaa/WIS_Scraper/releases/latest)からプログラムをダウンロードしてください。 
+
+Virus TotalやWindows Defenderによりウイルス判定され、自動的に削除される場合があります。</br> これはウイルスではなく、Pyinstallerの問題で発生していて、実際のウイルスではありませんので安心してご利用ください。
+
+**Virus Total Info**
+
+**MD5**</br>
+>166a2df4afb01727a8e5a8e5ef99875b</br>
+
+**SHA-1**</br>
+>eba0ecd07516f5685251d4dac48029213a4e7e56</br>
+
+**SHA-256**</br>
+>de7357cc4e1d1ebd90df7ab8b0fda3cedbd03ab894f1292595300bf71f1170d5</br>
+
+
+## 
+### コードで利用したい方へ
+
+以下の順番に沿ってインストールしてください。
 
 **Clone and Install Script**
 
@@ -16,6 +47,8 @@ git clone https://github.com/refiaa/WIS_Scraper.git
 cd WIS_Scraper
 pip install -r requirements.txt
 ```
+そのあと***WIS_InfoWindow.py***を実行してください。</br>
+ファイルのディレクトリ構造は以下のようになります。
 
 **File Tree Structure**
 ```shell script
@@ -25,7 +58,11 @@ WIS_Scraper
 └─src
 ```
 
-**How To Use**
+<div align="center">
+
+## How To Use
+
+<div align="left">
 
 ![2024-01-07 132820](https://github.com/refiaa/WIS_Scraper/assets/112306763/a695c404-20e2-40fb-8d12-6c931725464b)
 
