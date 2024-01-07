@@ -23,7 +23,7 @@ WIS_Scraperは国土交通省の水文水質データベースからデータの
 
 Virus TotalやWindows Defenderによりウイルス判定され、自動的に削除される場合があります。</br> これはウイルスではなく、Pyinstallerの問題で発生していて、実際のウイルスではありませんので安心してご利用ください。
 
-**Virus Total Info**
+**Virus Total File Hash Info**
 
 **MD5**</br>
 >166a2df4afb01727a8e5a8e5ef99875b</br>
