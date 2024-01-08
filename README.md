@@ -88,7 +88,7 @@ WIS_Scraper
 ・Readmeをアップデートしました。
 ```
 
-### 240108.2131
+### 240108.2353
 ```
-・WIS_DetailInfoWindowの一部のコードを修正しました。
+・WIS_DetailInfoWindowの一部のコードや構造を修正し、昨日を最適化しました。
 ```

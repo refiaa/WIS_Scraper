@@ -11,9 +11,9 @@ from getObservationInfo import ObservationDataMatcher
 
 # SrchRainData3のデータ処理プロセス
 # process_data → handle_rain_data → handle_specific_data → SrchRainData_3クラスに移動
-#                                 → add_date_input_fields_3 → add_date_input_fields_3 → on_confirm_clicked_3
+#                                 → add_date_input_fields_3 → add_date_input_fields_3 → on_data_confirm_3
 
-def date_input_decorator(input_type):
+def date_input(input_type):
     def decorator(func):
         def wrapper(self, *args, **kwargs):
             self.date_input_layout = QHBoxLayout()
@@ -37,6 +37,52 @@ def date_input_decorator(input_type):
             self.date_input_layout.addWidget(self.confirm_button)
 
             self.additional_container.addLayout(self.date_input_layout)
+        return wrapper
+    return decorator
+
+def data_confirm(data_type):
+    def decorator(func):
+        def wrapper(self, *args, **kwargs):
+            start_str = self.start_input.text()
+            end_str = self.end_input.text()
+
+            if data_type == 'date':
+                if not all(char.isdigit() or char == '/' for char in start_str + end_str):
+                    QMessageBox.warning(self, "警告", "Invalid input")
+                    return
+
+                try:
+                    start_year, start_month = map(int, start_str.split('/'))
+                    end_year, end_month = map(int, end_str.split('/'))
+
+                    if not (1 <= start_month <= 12) or not (1 <= end_month <= 12):
+                        QMessageBox.warning(self, "警告", "Invalid Month")
+                        return
+
+                    if start_year > end_year or (start_year == end_year and start_month > end_month):
+                        QMessageBox.warning(self, "警告", "Invalid range")
+                        return
+
+                except ValueError:
+                    QMessageBox.warning(self, "警告", "Invalid Date Format")
+                    return
+                
+                func(self, start_year, end_year, start_month, end_month)
+
+            elif data_type == 'year':
+                if not start_str.isdigit() or not end_str.isdigit():
+                    QMessageBox.warning(self, "警告", "Invalid input")
+                    return
+
+                start_year = int(start_str)
+                end_year = int(end_str)
+
+                if start_year > end_year:
+                    QMessageBox.warning(self, "警告", "Invalid range")
+                    return
+
+                func(self, start_year, end_year)
+
         return wrapper
     return decorator
 
@@ -220,144 +266,58 @@ class DetailInfoWindow(QDialog):
         }
         return data_type_mapping.get(data_type_code, 'UnknownData')
 
-############################################ SrchRainData_1に関するロジック ############################################
-
-    @date_input_decorator(input_type='date')
-    def add_date_input_fields_1(self):
-        self.confirm_button.clicked.disconnect()
-        self.confirm_button.clicked.connect(self.on_confirm_clicked_1)
-
-    def on_confirm_clicked_1(self):
-        start_date_str = self.start_input.text()
-        end_date_str = self.end_input.text()
-
-        if not all(char.isdigit() or char == '/' for char in start_date_str + end_date_str):
-            QMessageBox.warning(self, "警告", "Invalid input")
-            return
-
-        try:
-            start_year, start_month = map(int, start_date_str.split('/'))
-            end_year, end_month = map(int, end_date_str.split('/'))
-
-            if not (1 <= start_month <= 12) or not (1 <= end_month <= 12):
-                QMessageBox.warning(self, "警告", "Invalid Month")
-                return
-
-            if start_year > end_year or (start_year == end_year and start_month > end_month):
-                QMessageBox.warning(self, "警告", "Invalid range")
-                return
-
-            self.valid_start_year = start_year
-            self.start_month = start_month
-            self.valid_end_year = end_year
-            self.end_month = end_month
-
-            temp_data_handler = SrchRainData_1(self.js_detail, 1, start_year, start_month, end_year, end_month)
-            filtered_years = temp_data_handler.filter_years()
-
-            all_years_in_range = [str(year) for year in range(start_year, end_year + 1)]
-
-            if not all(year in filtered_years for year in all_years_in_range):
-                QMessageBox.warning(self, "警告", "Invalid range")
-                return
-
-            data_handler = SrchRainData_1(self.js_detail, 1, self.valid_start_year, self.start_month, self.valid_end_year, self.end_month)
-            data_handler.scrape_data_for_months()
-
-            QMessageBox.information(self, "Download Complete", "Data download completed successfully.")
-
-        except ValueError:
-            QMessageBox.warning(self, "警告", "Invalid Date Format")
-            return
-
-#######################################################################################################################
-
-############################################ SrchRainData_2に関するロジック ############################################
-
-    # 日付入力・現在はSrchRainData_2にだけ有効、YYYY/MMで入力してもらい、on_confirm_clicked_2で日付の分離を実行
-
-    @date_input_decorator(input_type='date')
-    def add_date_input_fields_2(self):
-        self.confirm_button.clicked.disconnect()
-        self.confirm_button.clicked.connect(self.on_confirm_clicked_2)
-
-    def on_confirm_clicked_2(self):
-        start_date_str = self.start_input.text()
-        end_date_str = self.end_input.text()
-
-        if not all(char.isdigit() or char == '/' for char in start_date_str + end_date_str):
-            QMessageBox.warning(self, "警告", "Invalid input")
-            return
-
-        try:
-            start_year, start_month = map(int, start_date_str.split('/'))
-            end_year, end_month = map(int, end_date_str.split('/'))
-
-            if not (1 <= start_month <= 12) or not (1 <= end_month <= 12):
-                QMessageBox.warning(self, "警告", "Invalid Month")
-                return
-
-            if start_year > end_year or (start_year == end_year and start_month > end_month):
-                QMessageBox.warning(self, "警告", "Invalid range")
-                return
-
-            self.valid_start_year = start_year
-            self.start_month = start_month
-            self.valid_end_year = end_year
-            self.end_month = end_month
-
-            temp_data_handler = SrchRainData_2(self.js_detail, 2, start_year, start_month, end_year, end_month)
-            filtered_years = temp_data_handler.filter_years()
-
-            all_years_in_range = [str(year) for year in range(start_year, end_year + 1)]
-
-            if not all(year in filtered_years for year in all_years_in_range):
-                QMessageBox.warning(self, "警告", "Invalid range")
-                return
-
-            data_handler = SrchRainData_2(self.js_detail, 2, self.valid_start_year, self.start_month, self.valid_end_year, self.end_month)
-            data_handler.scrape_data_for_months()
-
-            QMessageBox.information(self, "Download Complete", "Data download completed successfully.")
-
-        except ValueError:
-            QMessageBox.warning(self, "警告", "Invalid Date Format")
-            return
-
-#######################################################################################################################
-
-############################################ SrchRainData_3に関するロジック ############################################
-
-    @date_input_decorator(input_type='year')
-    def add_date_input_fields_3(self):
-        self.confirm_button.clicked.disconnect()
-        self.confirm_button.clicked.connect(self.on_confirm_clicked_3)
-    
-    def on_confirm_clicked_3(self):
-        start_year_str = self.start_input.text()
-        end_year_str = self.end_input.text()
-
-        if not start_year_str.isdigit() or not end_year_str.isdigit():
-            QMessageBox.warning(self, "警告", "Invalid input")
-            return
-
-        start_year = int(start_year_str)
-        end_year = int(end_year_str)
-
-        if start_year > end_year:
-            QMessageBox.warning(self, "警告", "Invalid range")
-            return
-
-        self.valid_start_year = start_year
-        self.valid_end_year = end_year
-
-        temp_data_handler = SrchRainData_3(self.js_detail, 3, start_year, end_year)
-        filtered_years = temp_data_handler.filter_years()
+    # dataの実際の配列での有効範囲検証
+    def validate_years_range(self, data_handler_class, kind_value, start_year, end_year):
+        data_handler = data_handler_class(self.js_detail, kind_value, start_year, end_year)
+        filtered_years = data_handler.filter_years()
 
         all_years_in_range = [str(year) for year in range(start_year, end_year + 1)]
-
         if not all(year in filtered_years for year in all_years_in_range):
-            QMessageBox.warning(self, "警告", "Invalid range")
+            QMessageBox.warning(self, "警告", "Invalid Data range")
+            return False
+        return True
+
+    # SrchRainData_1
+    @date_input(input_type='date')
+    def add_date_input_fields_1(self):
+        self.confirm_button.clicked.disconnect()
+        self.confirm_button.clicked.connect(self.on_data_confirm_1)
+
+    @data_confirm(data_type='date')
+    def on_data_confirm_1(self, start_year, end_year, start_month, end_month):
+        if not self.validate_years_range(SrchRainData_1, 1, start_year, end_year):
+            return
+
+        data_handler = SrchRainData_1(self.js_detail, 1, start_year, start_month, end_year, end_month)
+        data_handler.scrape_data_for_months()
+
+        QMessageBox.information(self, "Download Complete", "Data download completed successfully.")
+
+    # SrchRainData_2
+    @date_input(input_type='date')
+    def add_date_input_fields_2(self):
+        self.confirm_button.clicked.disconnect()
+        self.confirm_button.clicked.connect(self.on_data_confirm_2)
+
+    @data_confirm(data_type='date')
+    def on_data_confirm_2(self, start_year, end_year, start_month, end_month):
+        if not self.validate_years_range(SrchRainData_2, 2, start_year, end_year):
+            return
+        
+        data_handler = SrchRainData_2(self.js_detail, 2, start_year, start_month, end_year, end_month)
+        data_handler.scrape_data_for_months()
+
+        QMessageBox.information(self, "Download Complete", "Data download completed successfully.")
+
+    # SrchRainData_3
+    @date_input(input_type='year')
+    def add_date_input_fields_3(self):
+        self.confirm_button.clicked.disconnect()
+        self.confirm_button.clicked.connect(self.on_data_confirm_3)
+    
+    @data_confirm(data_type='year')
+    def on_data_confirm_3(self, start_year, end_year, start_month=None, end_month=None):
+        if not self.validate_years_range(SrchRainData_3, 3, start_year, end_year):
             return
 
         data_handler = SrchRainData_3(self.js_detail, 3, start_year, end_year)
@@ -365,41 +325,21 @@ class DetailInfoWindow(QDialog):
 
         QMessageBox.information(self, "Download Complete", "Data download completed successfully.")
 
-#######################################################################################################################
-
-############################################ SrchRainData_4に関するロジック ############################################
-
-    @date_input_decorator(input_type='year')
+    # SrchRainData_4
+    @date_input(input_type='year')
     def add_date_input_fields_4(self):
         self.confirm_button.clicked.disconnect()
-        self.confirm_button.clicked.connect(self.on_confirm_clicked_4)
+        self.confirm_button.clicked.connect(self.on_data_confirm_4)
 
-    def on_confirm_clicked_4(self):
-        start_year_str = self.start_input.text()
-        end_year_str = self.end_input.text()
-
-        if not start_year_str.isdigit() or not end_year_str.isdigit():
-            QMessageBox.warning(self, "警告", "Invalid range")
+    @data_confirm(data_type='year')
+    def on_data_confirm_4(self, start_year, end_year, start_month=None, end_month=None):
+        if not self.validate_years_range(SrchRainData_4, 4, start_year, end_year):
             return
-
-        start_year = int(start_year_str)
-        end_year = int(end_year_str)
-
-        temp_data_handler = SrchRainData_4(self.js_detail, 4, start_year, end_year)
-        filtered_years = temp_data_handler.filter_years()
-
-        all_years_in_range = [str(year) for year in range(start_year, end_year + 1)]
-
-        if not all(year in filtered_years for year in all_years_in_range):
-            QMessageBox.warning(self, "警告", "Invalid range")
-            return
-
+        
         data_handler = SrchRainData_4(self.js_detail, 4, start_year, end_year)
         data_handler.scrape_data_for_period()
-
+        
         QMessageBox.information(self, "Download Complete", "Data download completed successfully.")
-
-#######################################################################################################################
 
 if __name__ == '__main__':
     import sys
