@@ -22,7 +22,8 @@ WIS_Scraperは国土交通省の水文水質データベースからデータを
 
 この[ページ](https://github.com/refiaa/WIS_Scraper/releases/latest)からプログラムをダウンロードしてください。 
 
-Virus TotalやWindows Defenderによりウイルス判定され、自動的に削除される場合があります。</br> これはウイルスではなく、Pyinstallerの問題で発生していて、実際のウイルスではありませんので安心してご利用ください。
+Windows Defenderによりウイルス判定され、自動的に削除される場合があります。</br> これはウイルスではなく、Pyinstallerの問題で発生していて、実際のウイルスではありませんので安心してご利用ください。<br/>Bitdefender Total Securityからも安全判定されました。
+
 
 **Virus Total File Hash Info**
 
