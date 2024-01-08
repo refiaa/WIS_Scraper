@@ -90,5 +90,5 @@ WIS_Scraper
 
 ### 240108.2353
 ```
-・WIS_DetailInfoWindowの一部のコードや構造を修正し、昨日を最適化しました。
+・WIS_DetailInfoWindow.pyの内部構造の改善・最適化作業を行いました。機能に変わりはありません。
 ```
