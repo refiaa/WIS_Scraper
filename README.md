@@ -1,7 +1,7 @@
 
 <div align="center">
 
-# <img src="https://raw.githubusercontent.com/refiaa/WIS_Scraper/main/WIS_Scraper.ico" width="96" height="96"> </img> WIS Scraper 
+# <img src="https://raw.githubusercontent.com/refiaa/WIS_Scraper/main/WIS_Scraper.ico" width="96" height="96"> </img> ***WIS Scraper***
 
 <em><h5 align="center">(Programming Language - Python 3)</h5></em>
 
