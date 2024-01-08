@@ -13,6 +13,33 @@ from getObservationInfo import ObservationDataMatcher
 # process_data → handle_rain_data → handle_specific_data → SrchRainData_3クラスに移動
 #                                 → add_date_input_fields_3 → add_date_input_fields_3 → on_confirm_clicked_3
 
+def date_input_decorator(input_type):
+    def decorator(func):
+        def wrapper(self, *args, **kwargs):
+            self.date_input_layout = QHBoxLayout()
+
+            self.start_input = QLineEdit()
+            self.end_input = QLineEdit()
+            if input_type == 'year':
+                self.start_input.setPlaceholderText("Init Year")
+                self.end_input.setPlaceholderText("End Year")
+            
+            # input_type == 'date'
+            else:  
+                self.start_input.setPlaceholderText("Init Date (YYYY/MM)")
+                self.end_input.setPlaceholderText("End Date (YYYY/MM)")
+
+            self.date_input_layout.addWidget(self.start_input)
+            self.date_input_layout.addWidget(self.end_input)
+
+            self.confirm_button = QPushButton("Download Data")
+            self.confirm_button.clicked.connect(lambda: func(self, *args, **kwargs))
+            self.date_input_layout.addWidget(self.confirm_button)
+
+            self.additional_container.addLayout(self.date_input_layout)
+        return wrapper
+    return decorator
+
 class DetailInfoWindow(QDialog):
     def __init__(self, parent=None, name=None, js_detail=None):
         super().__init__(parent)
@@ -195,26 +222,14 @@ class DetailInfoWindow(QDialog):
 
 ############################################ SrchRainData_1に関するロジック ############################################
 
+    @date_input_decorator(input_type='date')
     def add_date_input_fields_1(self):
-        self.date_input_layout = QHBoxLayout()
-
-        self.start_date_input = QLineEdit()
-        self.start_date_input.setPlaceholderText("Init Date (YYYY/MM)")
-        self.date_input_layout.addWidget(self.start_date_input)
-
-        self.end_date_input = QLineEdit()
-        self.end_date_input.setPlaceholderText("End Date (YYYY/MM)")
-        self.date_input_layout.addWidget(self.end_date_input)
-
-        self.confirm_button = QPushButton("Download Data")
+        self.confirm_button.clicked.disconnect()
         self.confirm_button.clicked.connect(self.on_confirm_clicked_1)
-        self.date_input_layout.addWidget(self.confirm_button)
-
-        self.additional_container.addLayout(self.date_input_layout)
 
     def on_confirm_clicked_1(self):
-        start_date_str = self.start_date_input.text()
-        end_date_str = self.end_date_input.text()
+        start_date_str = self.start_input.text()
+        end_date_str = self.end_input.text()
 
         if not all(char.isdigit() or char == '/' for char in start_date_str + end_date_str):
             QMessageBox.warning(self, "警告", "Invalid input")
@@ -261,26 +276,14 @@ class DetailInfoWindow(QDialog):
 
     # 日付入力・現在はSrchRainData_2にだけ有効、YYYY/MMで入力してもらい、on_confirm_clicked_2で日付の分離を実行
 
+    @date_input_decorator(input_type='date')
     def add_date_input_fields_2(self):
-        self.date_input_layout_2 = QHBoxLayout()
-
-        self.start_date_input = QLineEdit()
-        self.start_date_input.setPlaceholderText("Init Date (YYYY/MM)")
-        self.date_input_layout_2.addWidget(self.start_date_input)
-
-        self.end_date_input = QLineEdit()
-        self.end_date_input.setPlaceholderText("End Date (YYYY/MM)")
-        self.date_input_layout_2.addWidget(self.end_date_input)
-
-        self.confirm_button_2 = QPushButton("Download Data")
-        self.confirm_button_2.clicked.connect(self.on_confirm_clicked_2)
-        self.date_input_layout_2.addWidget(self.confirm_button_2)
-
-        self.additional_container.addLayout(self.date_input_layout_2)
+        self.confirm_button.clicked.disconnect()
+        self.confirm_button.clicked.connect(self.on_confirm_clicked_2)
 
     def on_confirm_clicked_2(self):
-        start_date_str = self.start_date_input.text()
-        end_date_str = self.end_date_input.text()
+        start_date_str = self.start_input.text()
+        end_date_str = self.end_input.text()
 
         if not all(char.isdigit() or char == '/' for char in start_date_str + end_date_str):
             QMessageBox.warning(self, "警告", "Invalid input")
@@ -325,33 +328,21 @@ class DetailInfoWindow(QDialog):
 
 ############################################ SrchRainData_3に関するロジック ############################################
 
-    # 日付入力・現在はSrchRainData_3にだけ有効
+    @date_input_decorator(input_type='year')
     def add_date_input_fields_3(self):
-        self.date_input_layout = QHBoxLayout()
-        self.start_year_input = QLineEdit()
-        self.start_year_input.setPlaceholderText("Init Year")
-        self.date_input_layout.addWidget(self.start_year_input)
-
-        self.end_year_input = QLineEdit()
-        self.end_year_input.setPlaceholderText("End Year")
-        self.date_input_layout.addWidget(self.end_year_input)
-
-        self.confirm_button = QPushButton("Download Data")
+        self.confirm_button.clicked.disconnect()
         self.confirm_button.clicked.connect(self.on_confirm_clicked_3)
-        self.date_input_layout.addWidget(self.confirm_button)
-        self.additional_container.addLayout(self.date_input_layout)
-
-    # confirmのクリック処理
+    
     def on_confirm_clicked_3(self):
-        start_year = self.start_year_input.text()
-        end_year = self.end_year_input.text()
+        start_year_str = self.start_input.text()
+        end_year_str = self.end_input.text()
 
-        if not start_year.isdigit() or not end_year.isdigit():
+        if not start_year_str.isdigit() or not end_year_str.isdigit():
             QMessageBox.warning(self, "警告", "Invalid input")
             return
 
-        start_year = int(start_year)
-        end_year = int(end_year)
+        start_year = int(start_year_str)
+        end_year = int(end_year_str)
 
         if start_year > end_year:
             QMessageBox.warning(self, "警告", "Invalid range")
@@ -378,33 +369,21 @@ class DetailInfoWindow(QDialog):
 
 ############################################ SrchRainData_4に関するロジック ############################################
 
+    @date_input_decorator(input_type='year')
     def add_date_input_fields_4(self):
-        self.date_input_layout = QHBoxLayout()
-
-        self.start_year_input = QLineEdit()
-        self.start_year_input.setPlaceholderText("Init Year")
-        self.date_input_layout.addWidget(self.start_year_input)
-
-        self.end_year_input = QLineEdit()
-        self.end_year_input.setPlaceholderText("End Year")
-        self.date_input_layout.addWidget(self.end_year_input)
-
-        self.confirm_button = QPushButton("Download Data")
+        self.confirm_button.clicked.disconnect()
         self.confirm_button.clicked.connect(self.on_confirm_clicked_4)
-        self.date_input_layout.addWidget(self.confirm_button)
-
-        self.additional_container.addLayout(self.date_input_layout)
 
     def on_confirm_clicked_4(self):
-        start_year = self.start_year_input.text()
-        end_year = self.end_year_input.text()
+        start_year_str = self.start_input.text()
+        end_year_str = self.end_input.text()
 
-        if not start_year.isdigit() or not end_year.isdigit():
+        if not start_year_str.isdigit() or not end_year_str.isdigit():
             QMessageBox.warning(self, "警告", "Invalid range")
             return
 
-        start_year = int(start_year)
-        end_year = int(end_year)
+        start_year = int(start_year_str)
+        end_year = int(end_year_str)
 
         temp_data_handler = SrchRainData_4(self.js_detail, 4, start_year, end_year)
         filtered_years = temp_data_handler.filter_years()
