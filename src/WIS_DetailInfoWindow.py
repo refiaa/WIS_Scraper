@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont, QColor
 
-from getSrchRainData import SrchRainData_1, SrchRainData_2, SrchRainData_3, SrchRainData_4
+from SrchRainData import SrchRainData_1, SrchRainData_2, SrchRainData_3, SrchRainData_4
 from getObservationInfo import ObservationDataMatcher
 
 # SrchRainData3のデータ処理プロセス
