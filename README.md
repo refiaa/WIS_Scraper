@@ -11,7 +11,7 @@
 [![WIS_Scraper License](https://img.shields.io/github/license/refiaa/WIS_Scraper?color=orange)](#)
 
 
-WIS_Scraperは国土交通省の水文水質データベースからデータの検索・ダウンロードのためのツールです。</br>
+WIS_Scraperは国土交通省の水文水質データベースからデータを検索・取得・ダウンロードするためのツールです。</br>
 このプログラムはWindowsでの実行を想定しています。Macでの実行は検証されておりません。
 
 ## Getting Started
