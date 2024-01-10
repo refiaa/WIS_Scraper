@@ -9,10 +9,9 @@ from PyQt5.QtGui import QFont, QColor
 from SrchRainData import SrchRainData_1, SrchRainData_2, SrchRainData_3, SrchRainData_4
 from getObservationInfo import ObservationDataMatcher
 
-# SrchRainData3のデータ処理プロセス
-# process_data → handle_rain_data → handle_specific_data → SrchRainData_3クラスに移動
-#                                 → add_date_input_fields_3 → add_date_input_fields_3 → on_data_confirm_3
+# ========================== Decorater Part ========================== #
 
+# handle data input by @date @year
 def date_input(input_type):
     def decorator(func):
         def wrapper(self, *args, **kwargs):
@@ -40,6 +39,7 @@ def date_input(input_type):
         return wrapper
     return decorator
 
+# handle data confirm for data input by @date @year
 def data_confirm(data_type):
     def decorator(func):
         def wrapper(self, *args, **kwargs):
@@ -86,6 +86,19 @@ def data_confirm(data_type):
         return wrapper
     return decorator
 
+# handle data type for rain and water by @rain @water
+def data_type_decorator(data_type):
+    def decorator(func):
+        def wrapper(self, *args, **kwargs):
+            if data_type == 'rain':
+                return func(self, *args, **kwargs, data_class_prefix="SrchRainData")
+            elif data_type == 'water':
+                return func(self, *args, **kwargs, data_class_prefix="SrchWaterData")
+            else:
+                raise ValueError("Invalid data type")
+        return wrapper
+    return decorator
+
 class DetailInfoWindow(QDialog):
     def __init__(self, parent=None, name=None, js_detail=None):
         super().__init__(parent)
@@ -109,71 +122,7 @@ class DetailInfoWindow(QDialog):
         self.main_layout.addLayout(self.header_layout)
         self.main_layout.addLayout(self.additional_container)
 
-    # data_typeの処理
-    def process_data(self):
-        matcher = ObservationDataMatcher(self.js_detail, self.name)
-        is_name_present, kind_value = matcher.check_name_in_page()
-        data_type_code = matcher.check_data_type()
-
-        data_type = self.get_data_type(data_type_code)
-        kind_value_int = int(kind_value)
-
-        # SrchRainDataの処理　
-        # handle_rain_dataに移動
-        if data_type == 'SrchRainData':
-            self.handle_rain_data(kind_value_int) # SrchRainDataの時だけhandle_rain_dataに移動
-        else:
-            self.display_message("Not Supported Yet")
-
-    # SrchRainDataのデータ処理、
-    # process_dataから移動、handle_specific_dataに移動
-    def handle_rain_data(self, kind_value_int):
-        if kind_value_int == 1:
-            self.handle_specific_data(SrchRainData_1, kind_value_int, self.valid_start_year, self.start_month, self.valid_end_year, self.end_month)
-            self.add_date_input_fields_1()
-            
-        elif kind_value_int == 2:
-            self.handle_specific_data(SrchRainData_2, kind_value_int, self.valid_start_year, self.start_month, self.valid_end_year, self.end_month)
-            self.add_date_input_fields_2()
-        
-        elif kind_value_int == 3:
-            self.handle_specific_data(SrchRainData_3, kind_value_int, self.valid_start_year, self.valid_end_year)
-            self.add_date_input_fields_3()
-        
-        elif kind_value_int == 4:
-            self.handle_specific_data(SrchRainData_4, kind_value_int, self.valid_start_year, self.valid_end_year)
-            self.add_date_input_fields_4()
-
-    # start_yearやend_yearなどのDataClassにより異なるロジックを処理
-    # handle_rain_dataから移動
-
-    def handle_specific_data(self, DataClass, kind_value_int, start_year=None, end_year=None, start_month=None, end_month=None):
-        # SrchRainData_3の場合のみ、start_year, end_yearを処理
-        # 別のデータにおいては別のデータ処理プロセスを追加
-
-        if DataClass == SrchRainData_1:
-            data_handler = DataClass(self.js_detail, kind_value_int, start_year, start_month, end_year, end_month)
-        
-        elif DataClass == SrchRainData_2:
-            data_handler = DataClass(self.js_detail, kind_value_int, start_year, start_month, end_year, end_month)
-        
-        elif DataClass == SrchRainData_3:
-            data_handler = DataClass(self.js_detail, kind_value_int, start_year, end_year)
-
-        elif DataClass == SrchRainData_4:
-            data_handler = DataClass(self.js_detail, kind_value_int, start_year, end_year)
-        
-        else:
-            data_handler = DataClass(self.js_detail, kind_value_int)
-
-        header_value = data_handler.fetch_header_value()
-        self.display_header_value(header_value)
-
-        table_data = data_handler.fetch_table_data()
-        self.display_table_data(table_data)
-
-        station_data = data_handler.fetch_station_data()
-        self.display_station_data(station_data)
+# ============================ 共通関数 ============================== #
 
     def display_station_data(self, station_data):
         if not station_data:
@@ -274,12 +223,84 @@ class DetailInfoWindow(QDialog):
         all_years_in_range = [str(year) for year in range(start_year, end_year + 1)]
         if not all(year in filtered_years for year in all_years_in_range):
             QMessageBox.warning(self, "警告", "Invalid Data range")
-            return False
+            return Falses
         return True
+
+    # data_typeの処理
+    def process_data(self):
+        matcher = ObservationDataMatcher(self.js_detail, self.name)
+        is_name_present, kind_value = matcher.check_name_in_page()
+        data_type_code = matcher.check_data_type()
+
+        data_type = self.get_data_type(data_type_code)
+        kind_value_int = int(kind_value)
+
+        # SrchRainDataの処理　
+        # handle_data_rainに移動
+        if data_type == 'SrchRainData':
+            self.handle_data_rain(kind_value_int) # SrchRainDataの時だけhandle_data_rainに移動
+
+        else:
+            self.display_message("Not Supported Yet")
+
+# ========================= SrchWaterData Part ========================== #
+
+# ========================== SrchRainData Part ========================== #
+
+    # SrchRainDataのデータ処理、
+    # process_dataから移動、handle_specific_data_rainに移動
+    @data_type_decorator(data_type="rain")
+    def handle_data_rain(self, kind_value_int, data_class_prefix):
+        data_class = lambda x: globals()[f'{data_class_prefix}_{x}']
+        
+        if kind_value_int == 1:
+            self.handle_specific_data_rain(data_class(1), kind_value_int, self.valid_start_year, self.start_month, self.valid_end_year, self.end_month)
+            self.add_date_input_fields_rain_1()
+
+        elif kind_value_int == 2:
+            self.handle_specific_data_rain(data_class(2), kind_value_int, self.valid_start_year, self.start_month, self.valid_end_year, self.end_month)
+            self.add_date_input_fields_rain_2()
+        
+        elif kind_value_int == 3:
+            self.handle_specific_data_rain(data_class(3), kind_value_int, self.valid_start_year, self.valid_end_year)
+            self.add_date_input_fields_rain_3()
+        
+        elif kind_value_int == 4:
+            self.handle_specific_data_rain(data_class(4), kind_value_int, self.valid_start_year, self.valid_end_year)
+            self.add_date_input_fields_rain_4()
+
+    # start_yearやend_yearなどのDataClassにより異なるロジックを処理
+    # handle_data_rainから移動
+
+    @data_type_decorator(data_type="rain")
+    def handle_specific_data_rain(self, DataClass, kind_value_int, start_year=None, end_year=None, start_month=None, end_month=None, data_class_prefix=None):
+        if DataClass == globals()[f'{data_class_prefix}_1']:
+            data_handler = DataClass(self.js_detail, kind_value_int, start_year, start_month, end_year, end_month)
+
+        elif DataClass == globals()[f'{data_class_prefix}_2']:
+            data_handler = DataClass(self.js_detail, kind_value_int, start_year, start_month, end_year, end_month)
+        
+        elif DataClass == globals()[f'{data_class_prefix}_3']:
+            data_handler = DataClass(self.js_detail, kind_value_int, start_year, end_year)
+        
+        elif DataClass == globals()[f'{data_class_prefix}_4']:
+            data_handler = DataClass(self.js_detail, kind_value_int, start_year, end_year)
+        
+        else:
+            data_handler = DataClass(self.js_detail, kind_value_int)
+
+        header_value = data_handler.fetch_header_value()
+        self.display_header_value(header_value)
+
+        table_data = data_handler.fetch_table_data()
+        self.display_table_data(table_data)
+
+        station_data = data_handler.fetch_station_data()
+        self.display_station_data(station_data)
 
     # SrchRainData_1
     @date_input(input_type='date')
-    def add_date_input_fields_1(self):
+    def add_date_input_fields_rain_1(self):
         self.confirm_button.clicked.disconnect()
         self.confirm_button.clicked.connect(self.on_data_confirm_1)
 
@@ -295,7 +316,7 @@ class DetailInfoWindow(QDialog):
 
     # SrchRainData_2
     @date_input(input_type='date')
-    def add_date_input_fields_2(self):
+    def add_date_input_fields_rain_2(self):
         self.confirm_button.clicked.disconnect()
         self.confirm_button.clicked.connect(self.on_data_confirm_2)
 
@@ -311,7 +332,7 @@ class DetailInfoWindow(QDialog):
 
     # SrchRainData_3
     @date_input(input_type='year')
-    def add_date_input_fields_3(self):
+    def add_date_input_fields_rain_3(self):
         self.confirm_button.clicked.disconnect()
         self.confirm_button.clicked.connect(self.on_data_confirm_3)
     
@@ -327,7 +348,7 @@ class DetailInfoWindow(QDialog):
 
     # SrchRainData_4
     @date_input(input_type='year')
-    def add_date_input_fields_4(self):
+    def add_date_input_fields_rain_4(self):
         self.confirm_button.clicked.disconnect()
         self.confirm_button.clicked.connect(self.on_data_confirm_4)
 
@@ -340,6 +361,8 @@ class DetailInfoWindow(QDialog):
         data_handler.scrape_data_for_period()
         
         QMessageBox.information(self, "Download Complete", "Data download completed successfully.")
+
+# ======================================================================= #
 
 if __name__ == '__main__':
     import sys
