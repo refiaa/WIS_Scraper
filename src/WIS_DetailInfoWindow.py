@@ -223,7 +223,7 @@ class DetailInfoWindow(QDialog):
         all_years_in_range = [str(year) for year in range(start_year, end_year + 1)]
         if not all(year in filtered_years for year in all_years_in_range):
             QMessageBox.warning(self, "警告", "Invalid Data range")
-            return Falses
+            return False
         return True
 
     # data_typeの処理
