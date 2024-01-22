@@ -390,6 +390,10 @@ class DetailInfoWindow(QDialog):
             self.handle_specific_data_rain(data_class(4), kind_value_int, self.valid_start_year, self.valid_end_year)
             self.add_date_input_fields_rain_4()
 
+        else:
+            self.display_message("Not Supported Data Type")
+            return
+
     # start_yearやend_yearなどのDataClassにより異なるロジックを処理
     # handle_data_rainから移動
 
