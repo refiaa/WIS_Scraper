@@ -794,7 +794,7 @@ class App(QWidget):
                 zip_ref.extractall("temp_update")
 
             if self.replace_exe_with_temp(file_name):
-                msg_box = QMessageBox()
+                msg_box = QMessageBox(self)
                 msg_box.setIcon(QMessageBox.Information)
                 msg_box.setWindowTitle("更新情報")
                 msg_box.setText("再起動します。")
@@ -802,7 +802,7 @@ class App(QWidget):
 
                 self.schedule_update()
                 QApplication.quit()
-        
+
         except Exception as e:
             QMessageBox.warning(self, "更新エラー", f"アップデートの中にエラーが起きました。: {e}")
 
