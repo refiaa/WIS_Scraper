@@ -7,15 +7,19 @@ import json
 import re
 import requests
 import markdown
+import zipfile
+import shutil
+import os
+import subprocess
 
 from functools import lru_cache
 from PyQt5.QtWidgets import (
                             QApplication, QWidget, QPushButton, QVBoxLayout, QHBoxLayout,
                             QTableWidget, QTableWidgetItem, QTextEdit, QSplitter, QLineEdit,
                             QLabel, QComboBox, QMessageBox, QTabWidget, QTabBar, 
-                            QDialog, QGroupBox, QSizePolicy
+                            QDialog, QGroupBox, QSizePolicy, QProgressBar, QProgressDialog
                             )
-from PyQt5.QtCore import Qt, QThread, pyqtSignal, QSize, QUrl
+from PyQt5.QtCore import Qt, QThread, pyqtSignal, QSize, QUrl, QTimer
 from PyQt5.QtGui import QColor, QPixmap, QDesktopServices
 
 from getWISInfo import RiverDataScraper
@@ -108,6 +112,72 @@ class LegalNoticeDialog(QDialog):
         
         layout.addWidget(licenseLabel)
 
+class UpdateChecker:
+    def __init__(self, local_version_file, remote_version_url):
+        self.local_version_file = local_version_file
+        self.remote_version_url = remote_version_url
+
+    def get_local_version(self):
+        with open(self.local_version_file, 'r') as file:
+            return file.read().strip()
+
+    def get_remote_version(self):
+        response = requests.get(self.remote_version_url)
+        if response.status_code == 200:
+            return response.text.strip()
+        return None
+
+    def check_update(self):
+        local_version = self.get_local_version()
+        remote_version = self.get_remote_version()
+
+        if local_version and remote_version and local_version != remote_version:
+            return True
+        return False
+
+class DownloadProgressDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("ダウンロード")
+        self.setFixedSize(400, 120)
+        self.setLayout(QVBoxLayout())
+
+        self.label = QLabel("ダウンロード中...")
+        self.label.setStyleSheet("font-size: 14px; color: black; font-weight: bold;")
+        self.layout().addWidget(self.label)
+
+        self.progressBar = QProgressBar(self)
+        self.layout().addWidget(self.progressBar)
+
+    def update_progress(self, percentage):
+        self.progressBar.setValue(percentage)
+
+class DownloadThread(QThread):
+    update_progress = pyqtSignal(int)
+
+    def __init__(self, url, file_name):
+        QThread.__init__(self)
+        self.url = url
+        self.file_name = file_name
+
+    def run(self):
+        response = requests.get(self.url, stream=True)
+        total_length = response.headers.get('content-length')
+
+        if total_length is None:
+            self.update_progress.emit(100)
+        
+        else:
+            total_length = int(total_length)
+            downloaded = 0
+
+            with open(self.file_name, 'wb') as file:
+                for data in response.iter_content(chunk_size=4096):
+                    downloaded += len(data)
+                    file.write(data)
+                    done = int(100 * downloaded / total_length)
+                    self.update_progress.emit(done)
+
 class App(QWidget):
     def __init__(self):
         super().__init__()
@@ -123,7 +193,7 @@ class App(QWidget):
         self.scraper = RiverDataScraper("http://www1.river.go.jp/cgi-bin/SrchSite.exe", 
                                         "./json/ken_values.json", "./json/suikei_values.json", "./json/komoku_values.json")
         self.version = self.read_version_file()
-
+        QTimer.singleShot(0, self.check_update)
         self.pageNumberLabel = QLabel("1")
 
         self.initUI()
@@ -681,9 +751,95 @@ class App(QWidget):
             QDesktopServices.openUrl(QUrl(link))
 
     def read_version_file(self):
-
         with open('VERSION', 'r') as file:
             return file.read().strip()
+
+    def check_update(self):
+        update_checker = UpdateChecker('VERSION', 'https://raw.githubusercontent.com/refiaa/WIS_Scraper/main/VERSION')
+        
+        if update_checker.check_update():
+            reply = QMessageBox.question(self, "更新情報", "新しいバージョンが利用可能です。最新版にアップデートしてご利用ください。", QMessageBox.Yes | QMessageBox.No)
+
+            if reply == QMessageBox.Yes:
+                self.start_update()
+
+    def start_update(self):
+        update_checker = UpdateChecker('VERSION', 'https://raw.githubusercontent.com/refiaa/WIS_Scraper/main/VERSION')
+        latest_version = update_checker.get_remote_version()
+
+        if latest_version:
+            download_url = f"https://github.com/refiaa/WIS_Scraper/releases/download/{latest_version}/{latest_version}.zip"
+            self.download_update(download_url, f"{latest_version}.zip")
+
+    def download_update(self, url, file_name):
+        self.download_dialog = DownloadProgressDialog(self)
+        self.download_dialog.setModal(True)
+        self.download_dialog.show()
+
+        self.download_thread = DownloadThread(url, file_name)
+        self.download_thread.update_progress.connect(self.download_dialog.update_progress)
+        self.download_thread.finished.connect(self.download_thread.deleteLater)
+        self.download_thread.finished.connect(self.download_dialog.close)
+        self.download_thread.start()
+        self.download_thread.finished.connect(lambda: self.ask_update(file_name))
+
+    def ask_update(self, file_name):
+        reply = QMessageBox.question(self, "更新情報", "インストールの準備ができました。今すぐインストールしますか？", QMessageBox.Yes | QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            self.install_update(file_name)
+
+    def install_update(self, file_name):
+        try:
+            with zipfile.ZipFile(file_name, 'r') as zip_ref:
+                zip_ref.extractall("temp_update")
+
+            if self.replace_exe_with_temp(file_name):
+                msg_box = QMessageBox()
+                msg_box.setIcon(QMessageBox.Information)
+                msg_box.setWindowTitle("更新情報")
+                msg_box.setText("再起動します。")
+                msg_box.exec_()
+
+                self.schedule_update()
+                QApplication.quit()
+        
+        except Exception as e:
+            QMessageBox.warning(self, "更新エラー", f"アップデートの中にエラーが起きました。: {e}")
+
+    def replace_exe_with_temp(self, downloaded_file_name):
+        try:
+            temp_exe_path = os.path.join(os.getcwd(), "temp_update", "WIS_Scraper.exe")
+            current_exe_path = sys.executable
+            
+            bat_path = os.path.join(os.getcwd(), "update_script.bat")
+
+            with open(bat_path, "w") as bat_file:
+                bat_file.write(f"""
+                    @echo off
+                    setlocal enabledelayedexpansion
+
+                    :waitloop
+                    timeout /t 1 /nobreak
+                    tasklist | find /i "WIS_Scraper.exe" >nul 2>&1
+                    if errorlevel 1 (
+                        xcopy "temp_update\\*.*" "." /E /H /Y
+                        start "" "WIS_Scraper.exe"
+                        rmdir /s /q "temp_update"
+                        del /f /q "{downloaded_file_name}"
+                        del "%~f0"
+                    ) else (
+                        goto waitloop
+                    )
+                    """)
+            return True
+        
+        except Exception as e:
+            QMessageBox.warning(self, "更新エラー", f"アップデートスクリプトの作成にエラーが起きました。: {e}")
+            return False
+
+    def schedule_update(self):
+        bat_path = os.path.join(os.getcwd(), "update_script.bat")
+        subprocess.Popen(["cmd.exe", "/C" + bat_path], shell=True)
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

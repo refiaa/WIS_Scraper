@@ -4,6 +4,7 @@
 *.pyc
 *.spec
 *.dat
+*.zip
 
 # directory path or directory name
 output/
