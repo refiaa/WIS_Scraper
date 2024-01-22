@@ -104,4 +104,4 @@ WIS_Scraper
 
 ## 問い合わせ
 
-不具合・お問い合わせに関したは issue の New Issue からお願いします。
+不具合・お問い合わせに関したは Issues の New issue からお願いします。
