@@ -7,7 +7,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QFont, QColor
 
 from SrchRainData import SrchRainData_1, SrchRainData_2, SrchRainData_3, SrchRainData_4
-from SrchWaterData import SrchWaterData_1, SrchWaterData_2, SrchWaterData_3, SrchWaterData_4
+from SrchWaterData import SrchWaterData_1, SrchWaterData_2, SrchWaterData_3, SrchWaterData_4, SrchWaterData_5, SrchWaterData_6, SrchWaterData_7, SrchWaterData_8
 
 from getObservationInfo import ObservationDataMatcher
 
@@ -251,6 +251,7 @@ class DetailInfoWindow(QDialog):
 # ========================= SrchWaterData Part ========================== #
 
     # this is not best way, which mean this code 'WIS_DetailInfoWindow.py hav to changed for DRY and SOLID Principle for program optimization
+    # REFACTORING IS REQUIRED
     
     @data_type_decorator(data_type="water")
     def handle_data_water(self, kind_value_int, data_class_prefix):
@@ -271,6 +272,22 @@ class DetailInfoWindow(QDialog):
         elif kind_value_int == 4:
             self.handle_specific_data_water(data_class(4), kind_value_int, self.valid_start_year, self.valid_end_year)
             self.add_date_input_fields_water_4()
+
+        elif kind_value_int == 5:
+            self.handle_specific_data_water(data_class(5), kind_value_int, self.valid_start_year, self.start_month, self.valid_end_year, self.end_month)
+            self.add_date_input_fields_water_5()
+
+        elif kind_value_int == 6:
+            self.handle_specific_data_water(data_class(6), kind_value_int, self.valid_start_year, self.start_month, self.valid_end_year, self.end_month)
+            self.add_date_input_fields_water_6()
+
+        elif kind_value_int == 7:
+            self.handle_specific_data_water(data_class(7), kind_value_int, self.valid_start_year, self.valid_end_year)
+            self.add_date_input_fields_water_7()
+        
+        elif kind_value_int == 8:
+            self.handle_specific_data_water(data_class(8), kind_value_int, self.valid_start_year, self.valid_end_year)
+            self.add_date_input_fields_water_8()
         
         else:
             self.display_message("Not Supported Data Type")
@@ -287,6 +304,18 @@ class DetailInfoWindow(QDialog):
             data_handler = DataClass(self.js_detail, kind_value_int, start_year, end_year)
         
         elif DataClass == globals()[f'{data_class_prefix}_4']:
+            data_handler = DataClass(self.js_detail, kind_value_int, start_year, end_year)
+
+        elif DataClass == globals()[f'{data_class_prefix}_5']:
+            data_handler = DataClass(self.js_detail, kind_value_int, start_year, start_month, end_year, end_month)
+
+        elif DataClass == globals()[f'{data_class_prefix}_6']:
+            data_handler = DataClass(self.js_detail, kind_value_int, start_year, start_month, end_year, end_month)
+
+        elif DataClass == globals()[f'{data_class_prefix}_7']:
+            data_handler = DataClass(self.js_detail, kind_value_int, start_year, end_year)
+
+        elif DataClass == globals()[f'{data_class_prefix}_8']:
             data_handler = DataClass(self.js_detail, kind_value_int, start_year, end_year)
         
         else:
@@ -362,6 +391,70 @@ class DetailInfoWindow(QDialog):
             return
         
         data_handler = SrchWaterData_4(self.js_detail, 4, start_year, end_year)
+        data_handler.scrape_data_for_period()
+        
+        QMessageBox.information(self, "Download Complete", "Data download completed successfully.")
+
+    # SrchwaterData_5
+    @date_input(input_type='date')
+    def add_date_input_fields_water_5(self):
+        self.confirm_button.clicked.disconnect()
+        self.confirm_button.clicked.connect(self.on_data_confirm_water_5)
+
+    @data_confirm(data_type='date')
+    def on_data_confirm_water_5(self, start_year, end_year, start_month, end_month):
+        if not self.validate_years_range(SrchWaterData_5, 5, start_year, end_year):
+            return
+        
+        data_handler = SrchWaterData_5(self.js_detail, 5, start_year, start_month, end_year, end_month)
+        data_handler.scrape_data_for_months()
+
+        QMessageBox.information(self, "Download Complete", "Data download completed successfully.")
+
+    # SrchwaterData_6
+    @date_input(input_type='date')
+    def add_date_input_fields_water_6(self):
+        self.confirm_button.clicked.disconnect()
+        self.confirm_button.clicked.connect(self.on_data_confirm_water_6)
+
+    @data_confirm(data_type='date')
+    def on_data_confirm_water_6(self, start_year, end_year, start_month, end_month):
+        if not self.validate_years_range(SrchWaterData_6, 6, start_year, end_year):
+            return
+
+        data_handler = SrchWaterData_6(self.js_detail, 6, start_year, start_month, end_year, end_month)
+        data_handler.scrape_data_for_months()
+
+        QMessageBox.information(self, "Download Complete", "Data download completed successfully.")
+
+    # SrchwaterData_7
+    @date_input(input_type='year')
+    def add_date_input_fields_water_7(self):
+        self.confirm_button.clicked.disconnect()
+        self.confirm_button.clicked.connect(self.on_data_confirm_water_7)
+    
+    @data_confirm(data_type='year')
+    def on_data_confirm_water_7(self, start_year, end_year, start_month=None, end_month=None):
+        if not self.validate_years_range(SrchWaterData_7, 7, start_year, end_year):
+            return
+
+        data_handler = SrchWaterData_7(self.js_detail, 7, start_year, end_year)
+        data_handler.scrape_data_for_years()
+
+        QMessageBox.information(self, "Download Complete", "Data download completed successfully.")
+
+    # SrchwaterData_8
+    @date_input(input_type='year')
+    def add_date_input_fields_water_8(self):
+        self.confirm_button.clicked.disconnect()
+        self.confirm_button.clicked.connect(self.on_data_confirm_water_8)
+
+    @data_confirm(data_type='year')
+    def on_data_confirm_water_8(self, start_year, end_year, start_month=None, end_month=None):
+        if not self.validate_years_range(SrchWaterData_8, 8, start_year, end_year):
+            return
+        
+        data_handler = SrchWaterData_8(self.js_detail, 8, start_year, end_year)
         data_handler.scrape_data_for_period()
         
         QMessageBox.information(self, "Download Complete", "Data download completed successfully.")
