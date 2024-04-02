@@ -222,7 +222,7 @@ class App(QWidget):
         
         textLabel = QLabel('Copyright (c) 2023-2024 <a href="https://github.com/refiaa">Refiaa</a>')
         textLabel.setOpenExternalLinks(False)
-        textLabel.linkActivated.connect(self.onTextLabelLinkClicked)
+        textLabel.linkActivated.connect(self.openExternalLink)
 
         legalNoticeButton = QPushButton("Legal Notice")
         legalNoticeButton.clicked.connect(self.openLegalNoticeDialog)
@@ -283,7 +283,7 @@ class App(QWidget):
         rightLayout = QHBoxLayout()
 
         databaseButton = QPushButton("水文水質データベース")
-        databaseButton.clicked.connect(self.openDatabaseLink)
+        databaseButton.clicked.connect(lambda: self.openExternalLink("http://www1.river.go.jp"))
 
         databaseButton.setStyleSheet("""
             QPushButton {
@@ -734,21 +734,13 @@ class App(QWidget):
         dialog = LegalNoticeDialog(self)
         dialog.exec_()
 
-    def openDatabaseLink(self):
+    def openExternalLink(self, url):
         reply = QMessageBox.question(self, '外部リンク', 
                                     "外部のウェブサイトに移動します",
                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
 
         if reply == QMessageBox.Yes:
-            QDesktopServices.openUrl(QUrl("http://www1.river.go.jp"))
-
-    def onTextLabelLinkClicked(self, link):
-        reply = QMessageBox.question(self, '外部リンク', 
-                                    "外部のウェブサイトに移動します",
-                                    QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-
-        if reply == QMessageBox.Yes:
-            QDesktopServices.openUrl(QUrl(link))
+            QDesktopServices.openUrl(QUrl(url))
 
     def read_version_file(self):
         with open('VERSION', 'r') as file:
