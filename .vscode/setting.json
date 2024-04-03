@@ -1,0 +1,9 @@
+{
+    "workbench.colorTheme": "Visual Studio 2019 Dark",
+    "[python]": {
+        "editor.formatOnType": true
+    },
+    "editor.guides.bracketPairs": true,
+    "liveServer.settings.donotShowInfoMsg": true,
+    "git.suggestSmartCommit": false
+}
