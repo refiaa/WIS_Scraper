@@ -10,7 +10,7 @@ from SrchRainData import SrchRainData_1, SrchRainData_2, SrchRainData_3, SrchRai
 from SrchWaterData import SrchWaterData_1, SrchWaterData_2, SrchWaterData_3, SrchWaterData_4, SrchWaterData_5, SrchWaterData_6, SrchWaterData_7, SrchWaterData_8
 
 from getObservationInfo import ObservationDataMatcher
-from decorators import date_input, data_confirm, data_type_decorator
+from utils.decorators import date_input, data_confirm, data_type_decorator
 
 class DetailInfoWindow(QDialog):
     def __init__(self, parent=None, name=None, js_detail=None):
