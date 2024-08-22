@@ -69,7 +69,7 @@ class SrchWaterData_1(SrchWaterData):
         self.end_year = end_year
         self.end_month = end_month
 
-    def collect_data_for_period(self):
+    def scrape_data_for_months(self):
         for year in range(self.start_year, self.end_year + 1):
             for month in range(1, 13):
                 if year == self.start_year and month < self.start_month:
@@ -86,7 +86,7 @@ class SrchWaterData_2(SrchWaterData):
         self.end_year = end_year
         self.end_month = end_month
 
-    def collect_data_for_period(self):
+    def scrape_data_for_months(self):
         for year in range(self.start_year, self.end_year + 1):
             for month in range(1, 13):
                 if year == self.start_year and month < self.start_month:
@@ -114,7 +114,7 @@ class SrchWaterData_3(SrchWaterData):
         self.start_year = start_year
         self.end_year = end_year
 
-    def collect_data_for_multiple_years(self):
+    def scrape_data_for_years(self):
         for year in range(self.start_year, self.end_year + 1):
             self.scrape_data_for_year(year)
 
@@ -153,7 +153,7 @@ class SrchWaterData_5(SrchWaterData):
         self.end_year = end_year
         self.end_month = end_month
 
-    def collect_data_for_period(self):
+    def scrape_data_for_months(self):
         for year in range(self.start_year, self.end_year + 1):
             for month in range(1, 13):
                 if year == self.start_year and month < self.start_month:
@@ -170,7 +170,7 @@ class SrchWaterData_6(SrchWaterData):
         self.end_year = end_year
         self.end_month = end_month
 
-    def collect_data_for_period(self):
+    def scrape_data_for_months(self):
         for year in range(self.start_year, self.end_year + 1):
             for month in range(1, 13):
                 if year == self.start_year and month < self.start_month:
@@ -198,7 +198,7 @@ class SrchWaterData_7(SrchWaterData):
         self.start_year = start_year
         self.end_year = end_year
 
-    def collect_data_for_multiple_years(self):
+    def scrape_data_for_years(self):
         for year in range(self.start_year, self.end_year + 1):
             self.scrape_data_for_year(year)
 
