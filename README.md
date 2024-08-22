@@ -50,15 +50,6 @@ cd WIS_Scraper
 pip install -r requirements.txt
 ```
 そのあと***WIS_InfoWindow.py***を実行してください。</br>
-ファイルのディレクトリ構造は以下のようになります。
-
-**File Tree Structure**
-```shell script
-WIS_Scraper
-├─img
-├─json
-└─src
-```
 
 <div align="center">
 
@@ -113,6 +104,7 @@ WIS_Scraper
 ```
 
 ### 240822.1823
+> Pyinstallerのウイルス判定エラーにより`240822.1823`のexeバージョンはまだアップデートされていません。
 ```
 ・SrchWaterDataとSrchRainDataを最適化しました
 ・保存されるdatファイルがSHIFT-JISからUTF-8になるように修正しました。
