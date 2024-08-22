@@ -1,6 +1,8 @@
 import requests
 import os
 import calendar
+import codecs
+
 from bs4 import BeautifulSoup
 from base_srch_data import BaseSrchData
 
@@ -14,10 +16,11 @@ class SrchRainData(BaseSrchData):
         response = requests.get(download_url)
 
         if response.status_code == 200:
+            content = response.content.decode('shift_jis', errors='replace').encode('utf-8')
             if month:
-                self.save_to_file(response.content, year, month)
+                self.save_to_file(content, year, month)
             else:
-                self.save_to_file(response.content, year)
+                self.save_to_file(content, year)
 
     def save_to_file(self, content, year, month=None):
         directory = f"./Download/SrchRainData_{self.kind_value}_{self.station_data.get('水系名', 'Unknown')}_{self.station_data.get('河川名', 'Unknown')}_{self.station_data.get('観測所名', 'Unknown')}"
