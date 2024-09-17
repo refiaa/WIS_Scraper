@@ -6,7 +6,7 @@
 <em><h5 align="center">(Programming Language - Python 3)</h5></em>
 
 
-[![GitHub release](https://img.shields.io/github/release/refiaa/WIS_Scraper.svg?color=e81416)](https://github.com/refiaa/WIS_Scraper/releases/latest)
+[![GitHub release](https://img.shields.io/github/release/refiaa/WIS_Scraper.svg?color=red)](https://github.com/refiaa/WIS_Scraper/releases/latest)
 [![Downloads](https://img.shields.io/github/downloads/refiaa/WIS_Scraper/total?color=ffa500)](https://github.com/refiaa/WIS_Scraper/releases/latest)
 [![WIS_Scraper issues](https://img.shields.io/github/issues/refiaa/WIS_Scraper?color=faeb36)](https://github.com/refiaa/WIS_Scraper/issues)
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/845c13619a784b498338649e74b11bbd)](https://app.codacy.com/gh/refiaa/WIS_Scraper/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
